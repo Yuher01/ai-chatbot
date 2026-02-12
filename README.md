@@ -1080,13 +1080,45 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-#### 2. Run the Application
+#### 2. Install Ollama (if not yet install)
+##### On Windows/Linux
+Using official installer:
 
+1. Go to: [Ollama Download](https://ollama.com/download)
+2. Download and install for your OS.
+4. Restart your terminal (PowerShell/CMD/bash).
+5. Verify installation:
 ```bash
-python app.py
+ollama --version
+```
+##### On macOS
+1. Install Homebrew
+2. Install Ollama via Homebrew:
+```bash
+brew install ollama
+```
+3. Verify installation:
+```bash
+ollama --version
+```
+4. Ensure Ollama server runs automatically:
+```bash
+brew services start ollama
 ```
 
-#### 3. Ask Questions
+#### 3. Install your local model from Ollama (if using the default model, else replace model name with your desired model or skip this step)
+1. In your terminal/powershell/cmd/bash, run:
+```bash
+ollama pull qwen3:4b-instruct-2507-q4_K_M
+```
+
+#### 4. Run the Application
+
+```bash
+python project/app.py
+```
+
+#### 5. Ask Questions
 
 Open the local URL (e.g., `http://127.0.0.1:7860`) to start chatting.
 
@@ -1187,6 +1219,12 @@ Agent: [Retrieves and answers with specific information]
 | **Chunk Size / Document Splitting** | - Answers lack context or feel fragmented<br>- Retrieval is slow or embedding costs are high | - Increase chunk & parent sizes for more context<br>- Decrease chunk sizes to improve speed and reduce costs |
 | **Temperature & Consistency** | - Responses inconsistent or overly creative<br>- Responses too rigid or repetitive | - Set temperature to `0` for factual, consistent output<br>- Slightly increase temperature for summarization or analysis tasks |
 | **Embedding Model Quality** | - Poor semantic search<br>- Weak performance on domain-specific or multilingual docs | - Use higher-quality or domain-specific embeddings<br>- Re-index all documents after changing embeddings |
+---
+
+## Acknowledgements
+
+This project is based on the original [Agentic RAG for Dummies](https://github.com/GiovanniPasq/agentic-rag-for-dummies) by [Giovanni Pasqualino](https://github.com/GiovanniPasq). Thank you for creating and sharing the foundation of this work.
+
 ---
 
 ## License
