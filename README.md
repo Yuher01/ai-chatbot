@@ -1,3 +1,40 @@
+## Changelog (from forked base)
+
+### Conversational Route & Intent Classification
+
+- Added a dedicated `conversational_response` node to handle non-document queries (greetings, capability questions, chitchat) without going through the RAG pipeline
+- `QueryAnalysis` schema now includes a `route` field (`"rag"` or `"conversational"`) with RAG-first bias — any query containing a topic routes to RAG even with filler words like "alright" or "ok"
+- `route_after_rewrite` now handles three paths: `conversational_response`, `human_input`, or fan-out to `process_question`
+- Added `route` field to graph `State`
+
+### Document-Aware Question Suggestions
+
+- New `_sample_document_snippets()` helper samples 3 random chunks per document using Qdrant's `query_points` with `SampleQuery(RANDOM)` and per-document filtering
+- Conversational node retrieves real content snippets so the LLM can suggest specific, content-aware questions (up to 5, at least one per document)
+- Aggregation node appends suggested questions when RAG fails to find an answer
+- New `get_suggestion_prompt()` and `get_conversational_prompt()` prompts
+- Qdrant collection threaded through graph to conversational and aggregate nodes
+
+### Incremental Conversation Summarization
+
+- `analyze_chat_and_summarize` now feeds the existing summary back into the summarizer, producing an updated summary that preserves older context instead of starting from scratch each turn
+- Summary word limit increased from 30-50 to 80-100 words
+
+### RAG Agent Response Guardrails
+
+- RAG agent prompt now enforces a fixed "couldn't find information" message on failed retrieval, preventing document metadata leakage
+- `aggregate_responses` strips the Sources section if it contains no real file names
+
+### Document Source Awareness
+
+- `RAGSystem.initialize()` accepts a `get_document_sources` callback, wired from the Gradio UI to provide runtime awareness of uploaded document filenames
+
+### Debug Mode
+
+- `app.py` enables LangChain debug logging via `set_debug(True)`
+
+---
+
 <p align="center">
 <img alt="Agentic RAG for Dummies Logo" src="assets/logo.png" width="350px">
 </p>
