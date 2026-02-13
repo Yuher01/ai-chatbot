@@ -23,3 +23,6 @@ HEADERS_TO_SPLIT_ON = [
     ("##", "H2"),
     ("###", "H3")
 ]
+
+# --- Lucky Draw Configuration ---
+LUCKY_DRAW_DB_PATH = "lucky_draw.db"

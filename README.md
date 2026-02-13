@@ -1,36 +1,33 @@
 ## Changelog (from forked base)
 
-### Conversational Route & Intent Classification
+### 2025-02-13
 
-- Added a dedicated `conversational_response` node to handle non-document queries (greetings, capability questions, chitchat) without going through the RAG pipeline
-- `QueryAnalysis` schema now includes a `route` field (`"rag"` or `"conversational"`) with RAG-first bias — any query containing a topic routes to RAG even with filler words like "alright" or "ok"
-- `route_after_rewrite` now handles three paths: `conversational_response`, `human_input`, or fan-out to `process_question`
-- Added `route` field to graph `State`
+**Lucky Draw Entry Flow**
+- Added self-contained lucky draw module (`project/lucky_draw/`) with multi-step state machine: intent detection → receipt submission → details collection → duplicate check → entry storage
+- LLM-powered intent detection with keyword fast-path and Ollama fallback for ambiguous messages
+- SQLite database for entry storage with auto-approval logic and duplicate detection by phone number
+- ChatInterface-level interception — zero changes to the existing LangGraph RAG pipeline
 
-### Document-Aware Question Suggestions
+**Conversational Route & Intent Classification**
+- Added `conversational_response` node for non-document queries (greetings, chitchat) bypassing RAG pipeline
+- `QueryAnalysis` schema now includes `route` field (`"rag"` or `"conversational"`) with RAG-first bias
+- `route_after_rewrite` handles three paths: `conversational_response`, `human_input`, or fan-out to `process_question`
 
-- New `_sample_document_snippets()` helper samples 3 random chunks per document using Qdrant's `query_points` with `SampleQuery(RANDOM)` and per-document filtering
-- Conversational node retrieves real content snippets so the LLM can suggest specific, content-aware questions (up to 5, at least one per document)
-- Aggregation node appends suggested questions when RAG fails to find an answer
+**Document-Aware Question Suggestions**
+- Conversational and aggregation nodes now suggest content-aware questions using sampled document snippets
 - New `get_suggestion_prompt()` and `get_conversational_prompt()` prompts
-- Qdrant collection threaded through graph to conversational and aggregate nodes
 
-### Incremental Conversation Summarization
+**Incremental Conversation Summarization**
+- Summarizer now feeds existing summary back in, preserving older context instead of starting fresh each turn
 
-- `analyze_chat_and_summarize` now feeds the existing summary back into the summarizer, producing an updated summary that preserves older context instead of starting from scratch each turn
-- Summary word limit increased from 30-50 to 80-100 words
+**RAG Agent Response Guardrails**
+- Enforced fixed "couldn't find information" message on failed retrieval, preventing metadata leakage
+- `aggregate_responses` strips Sources section if it contains no real file names
 
-### RAG Agent Response Guardrails
+**Document Source Awareness**
+- `RAGSystem.initialize()` accepts a `get_document_sources` callback for runtime document filename awareness
 
-- RAG agent prompt now enforces a fixed "couldn't find information" message on failed retrieval, preventing document metadata leakage
-- `aggregate_responses` strips the Sources section if it contains no real file names
-
-### Document Source Awareness
-
-- `RAGSystem.initialize()` accepts a `get_document_sources` callback, wired from the Gradio UI to provide runtime awareness of uploaded document filenames
-
-### Debug Mode
-
+**Debug Mode**
 - `app.py` enables LangChain debug logging via `set_debug(True)`
 
 ---
