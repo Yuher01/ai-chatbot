@@ -5,9 +5,8 @@ from core.rag_system import RAGSystem
 
 def create_gradio_ui():
     rag_system = RAGSystem()
-    rag_system.initialize()
-    
     doc_manager = DocumentManager(rag_system)
+    rag_system.initialize(get_document_sources=doc_manager.get_markdown_files)
     chat_interface = ChatInterface(rag_system)
     
     def format_file_list():

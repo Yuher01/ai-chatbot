@@ -17,13 +17,13 @@ class RAGSystem:
         self.agent_graph = None
         self.thread_id = str(uuid.uuid4())
         
-    def initialize(self):
+    def initialize(self, get_document_sources=None):
         self.vector_db.create_collection(self.collection_name)
         collection = self.vector_db.get_collection(self.collection_name)
-        
+
         llm = ChatOllama(model=config.LLM_MODEL, temperature=config.LLM_TEMPERATURE)
         tools = ToolFactory(collection).create_tools()
-        self.agent_graph = create_agent_graph(llm, tools)
+        self.agent_graph = create_agent_graph(llm, tools, collection=collection, get_document_sources=get_document_sources)
         
     def get_config(self):
         return {"configurable": {"thread_id": self.thread_id}}

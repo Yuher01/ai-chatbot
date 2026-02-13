@@ -7,7 +7,7 @@ from .graph_state import State
 from .nodes import *
 from .edges import *
 
-def create_agent_graph(llm, tools_list):
+def create_agent_graph(llm, tools_list, collection=None, get_document_sources=None):
     llm_with_tools = llm.bind_tools(tools_list)
     tool_node = ToolNode(tools_list)
 
@@ -31,14 +31,16 @@ def create_agent_graph(llm, tools_list):
     graph_builder.add_node("analyze_rewrite", partial(analyze_and_rewrite_query, llm=llm))
     graph_builder.add_node("human_input", human_input_node)
     graph_builder.add_node("process_question", agent_subgraph)
-    graph_builder.add_node("aggregate", partial(aggregate_responses, llm=llm))
-    
+    graph_builder.add_node("aggregate", partial(aggregate_responses, llm=llm, collection=collection, get_document_sources=get_document_sources))
+    graph_builder.add_node("conversational_response", partial(conversational_response, llm=llm, collection=collection, get_document_sources=get_document_sources))
+
     graph_builder.add_edge(START, "summarize")
     graph_builder.add_edge("summarize", "analyze_rewrite")
     graph_builder.add_conditional_edges("analyze_rewrite", route_after_rewrite)
     graph_builder.add_edge("human_input", "analyze_rewrite")
     graph_builder.add_edge(["process_question"], "aggregate")
     graph_builder.add_edge("aggregate", END)
+    graph_builder.add_edge("conversational_response", END)
 
     agent_graph = graph_builder.compile(
         checkpointer=checkpointer,

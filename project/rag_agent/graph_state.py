@@ -10,9 +10,10 @@ class State(MessagesState):
     """State for main agent graph"""
     questionIsClear: bool = False
     conversation_summary: str = ""
-    originalQuery: str = "" 
+    originalQuery: str = ""
     rewrittenQuestions: List[str] = []
     agent_answers: Annotated[List[dict], accumulate_or_reset] = []
+    route: str = "rag"
 
 class AgentState(MessagesState):
     """State for individual agent subgraph"""
